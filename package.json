@@ -1,0 +1,17 @@
+{
+  "name": "ice-base",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm run server"
+  },
+  "keywords": [
+    "ice",
+    "base",
+    "javascript",
+    "typescript"
+  ],
+  "author": "CORSAIR <vladimir.corsair@gmail.com>",
+  "license": "ISC"
+}
