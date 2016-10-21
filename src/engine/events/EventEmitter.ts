@@ -49,6 +49,8 @@ export default class EventEmitter extends Container<Container<iEventSet>> {
     }
 }
 
+/*
+
 //Example usage
 let events = new EventEmitter();
     events.on('click', console.warn, 'hbbvjgvgvg');
@@ -56,3 +58,4 @@ let events = new EventEmitter();
     events.remove('hbbvjgvgvg');
     events.emit('click', '2', 3, 4.5);//should never happens
 
+*/
