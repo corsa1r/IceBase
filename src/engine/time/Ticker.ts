@@ -15,6 +15,7 @@ export default class Ticker extends EventEmitter {
         this.delta = 0;
         this.lastTime = Date.now();
         this.clockId = setInterval(() => this.tick(), this.fps);
+        this.emit(Ticker.EVENTS.START, this.lastTime);
         return this;
     }
 
@@ -22,6 +23,7 @@ export default class Ticker extends EventEmitter {
         if (!this.clockId) return this;
         clearInterval(this.clockId);
         this.clockId = null;
+        this.emit(Ticker.EVENTS.STOP, this.lastTime);
         return this;
     }
 
@@ -33,6 +35,8 @@ export default class Ticker extends EventEmitter {
     }
 
     static EVENTS = {
-        TICK: 'tick'
+        TICK: 'tick',
+        START: 'start',
+        STOP: 'stop'
     };
 }
