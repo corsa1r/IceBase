@@ -4,28 +4,24 @@ export default class Ticker extends EventEmitter {
 
     private clockId: number | null;
     private lastTime: number | null;
-    private delta: number;
+    private delta: number = 0;
 
     constructor(private fps: number = 1000 / 60) {
         super();
     }
 
     start(): Ticker {
-        if (!this.clockId) {
-            this.delta = 0;
-            this.lastTime = Date.now();
-            this.clockId = setInterval(() => this.tick(), this.fps);
-        }
-
+        if (this.clockId) return this;
+        this.delta = 0;
+        this.lastTime = Date.now();
+        this.clockId = setInterval(() => this.tick(), this.fps);
         return this;
     }
 
     stop(): Ticker {
-        if (this.clockId) {
-            clearInterval(this.clockId);
-            this.clockId = null;
-        }
-
+        if (!this.clockId) return this;
+        clearInterval(this.clockId);
+        this.clockId = null;
         return this;
     }
 
