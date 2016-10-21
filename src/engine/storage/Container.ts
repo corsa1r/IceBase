@@ -28,9 +28,9 @@ export default class Container<T> extends Object {
         return this;
     }
 
-    get(item: T | string): T | undefined {
+    get(item: T | string): T | null {
         let index = this.indexOf(item);
-        return this.items[index];
+        return this.items[index] || null;
     }
 
     has(what: T | string): Boolean {
@@ -52,7 +52,7 @@ export default class Container<T> extends Object {
         }
     }
 
-    len(): Number {
+    get length() {
         return this.items.length;
     }
 }
