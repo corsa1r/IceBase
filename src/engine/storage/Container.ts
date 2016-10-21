@@ -34,6 +34,7 @@ export default class Container<T> extends Object {
     }
 
     has(what: T | string): Boolean {
+        if(this.length === 0) return false;
         return this.indexOf(what) !== -1;
     }
 
