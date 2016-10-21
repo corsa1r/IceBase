@@ -17,9 +17,7 @@ export default class Sequence<T> extends Container<T> {
     }
 
     next(): T {
-        if (++this.current >= this.length) {
-            this.current = 0;
-        }
+        if (++this.current >= this.length) this.current = 0;
         return this.get(this.current.toString());
     }
 }
