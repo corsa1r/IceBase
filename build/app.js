@@ -45,41 +45,9 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var GameObject_1 = __webpack_require__(2);
 	var Game_1 = __webpack_require__(13);
-	var PIXI = __webpack_require__(1);
 	var canvas = document.getElementById('canvas');
 	var game = new Game_1.default(canvas);
-	var Node = (function (_super) {
-	    __extends(Node, _super);
-	    function Node(color) {
-	        _super.call(this);
-	        this.setDraggable();
-	        var rect = new PIXI.Graphics();
-	        rect.beginFill(color);
-	        rect.drawRect(0, 0, 200, 70);
-	        rect.endFill();
-	        this.addChild(rect);
-	    }
-	    Node.prototype.dragstart = function () {
-	        this.alpha = 0.5;
-	    };
-	    Node.prototype.dragend = function () {
-	        this.alpha = 1;
-	    };
-	    return Node;
-	}(GameObject_1.default));
-	var n1 = new Node(0x90EE90);
-	var n2 = new Node(0x007b90);
-	n2.position.x = 300;
-	n2.position.y = 100;
-	game.stage.addChild(n1, n2);
-	game.ticker.scale(50);
 
 
 /***/ },
@@ -89,159 +57,8 @@
 	module.exports = PIXI;
 
 /***/ },
-/* 2 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Container_1 = __webpack_require__(12);
-	var Point_1 = __webpack_require__(9);
-	var Component_1 = __webpack_require__(3);
-	var DraggableData_1 = __webpack_require__(11);
-	var GameObject = (function (_super) {
-	    __extends(GameObject, _super);
-	    function GameObject() {
-	        _super.call(this);
-	        this.draggableData = new DraggableData_1.DraggableData();
-	        this.components = [];
-	        this.position = new Point_1.default();
-	        this.interactive = true;
-	    }
-	    GameObject.prototype.addComponent = function (component) {
-	        component.parent = this;
-	        this.components.push(Component_1.default.describe(component));
-	        this.addChild(component);
-	        return component;
-	    };
-	    GameObject.prototype.removeComponent = function (component) {
-	        var index = this.components.indexOf(Component_1.default.describe(component));
-	        this.components.splice(index, 1);
-	        this.removeChild(component);
-	        return component;
-	    };
-	    GameObject.prototype.update = function (delta) {
-	        return this;
-	    };
-	    GameObject.prototype.setDraggable = function (state) {
-	        if (state === void 0) { state = true; }
-	        if (state && !this.draggableData.eventsOnce)
-	            this.initDragEvents();
-	        if (!state)
-	            this.onDragEnd();
-	        this.draggableData.enabled = state;
-	        return this;
-	    };
-	    GameObject.prototype.initDragEvents = function () {
-	        var _this = this;
-	        this.draggableData.eventsOnce = true;
-	        // events for drag start
-	        this.on(GameObject.EVENTS.MOUSEDOWN, function (e) { return _this.onDragStart(e); });
-	        this.on(GameObject.EVENTS.TOUCHSTART, function (e) { return _this.onDragStart(e); });
-	        // events for drag end
-	        this.on(GameObject.EVENTS.MOUSEUP, function () { return _this.onDragEnd(); });
-	        this.on(GameObject.EVENTS.MOUSEUPOUTSIDE, function () { return _this.onDragEnd(); });
-	        this.on(GameObject.EVENTS.TOUCHEND, function () { return _this.onDragEnd(); });
-	        this.on(GameObject.EVENTS.TOUCHENDOUTSIDE, function () { return _this.onDragEnd(); });
-	        // events for drag move
-	        this.on(GameObject.EVENTS.MOUSEMOVE, function (e) { return _this.onDragMove(e); });
-	        this.on(GameObject.EVENTS.TOUCHMOVE, function (e) { return _this.onDragMove(e); });
-	    };
-	    GameObject.prototype.onDragStart = function (event) {
-	        if (!this.draggableData.enabled)
-	            return;
-	        this.draggableData.dragStart = this.draggableData.get(event)
-	            .clone().sub(this.position.x, this.position.y);
-	        this.draggableData.dragging = true;
-	        if (this.draggableData.index) {
-	            this.emit(GameObject.EVENTS.DRAGSTART);
-	            this.dragstart();
-	        }
-	    };
-	    GameObject.prototype.onDragMove = function (event) {
-	        if (!this.draggableData.enabled)
-	            return;
-	        if (!this.draggableData.dragging)
-	            return;
-	        this.position.copy(this.draggableData.getGap(event));
-	        this.emit(GameObject.EVENTS.DRAG);
-	        this.drag();
-	        this.draggableData.index++;
-	        if (this.draggableData.index === 1) {
-	            this.emit(GameObject.EVENTS.DRAGSTART);
-	            this.dragstart();
-	        }
-	    };
-	    GameObject.prototype.onDragEnd = function () {
-	        if (!this.draggableData.enabled)
-	            return;
-	        this.draggableData.dragging = false;
-	        this.emit(GameObject.EVENTS.DRAGEND);
-	        this.dragend();
-	        this.draggableData.index = 0;
-	    };
-	    //@abstract methods
-	    GameObject.prototype.dragstart = function () { };
-	    GameObject.prototype.drag = function () { };
-	    GameObject.prototype.dragend = function () { };
-	    GameObject.EVENTS = {
-	        DRAGSTART: 'dragstart',
-	        DRAG: 'drag',
-	        DRAGEND: 'dragend',
-	        MOUSEDOWN: 'mousedown',
-	        TOUCHSTART: 'touchstart',
-	        MOUSEUP: 'mouseup',
-	        MOUSEUPOUTSIDE: 'mouseupoutside',
-	        TOUCHEND: 'touchend',
-	        TOUCHENDOUTSIDE: 'touchendoutside',
-	        MOUSEMOVE: 'mousemove',
-	        TOUCHMOVE: 'touchmove',
-	        CLICK: 'click',
-	        TAP: 'tap'
-	    };
-	    return GameObject;
-	}(Container_1.default));
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = GameObject;
-
-
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Container_1 = __webpack_require__(12);
-	var Component = (function (_super) {
-	    __extends(Component, _super);
-	    function Component(name) {
-	        _super.call(this);
-	        this.name = name;
-	    }
-	    Component.prototype.update = function (delta) {
-	        return this;
-	    };
-	    Component.describe = function (component) {
-	        var describe = {
-	            name: component.name,
-	            component: component
-	        };
-	        return describe;
-	    };
-	    return Component;
-	}(Container_1.default));
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = Component;
-
-
-/***/ },
+/* 2 */,
+/* 3 */,
 /* 4 */
 /***/ function(module, exports) {
 
@@ -264,7 +81,10 @@
 	var PIXI = __webpack_require__(1);
 	var Renderer = (function () {
 	    function Renderer(screen) {
-	        this.engine = PIXI.autoDetectRenderer(screen.canvas.width, screen.canvas.height, { view: screen.canvas });
+	        this.engine = PIXI.autoDetectRenderer(screen.canvas.width, screen.canvas.height, {
+	            view: screen.canvas,
+	            antialias: true
+	        });
 	    }
 	    Renderer.prototype.draw = function (stage) {
 	        this.engine.render(stage);
@@ -673,76 +493,9 @@
 
 
 /***/ },
-/* 9 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var PIXI = __webpack_require__(1);
-	var Point = (function (_super) {
-	    __extends(Point, _super);
-	    function Point(x, y) {
-	        _super.call(this, x, y);
-	    }
-	    Point.prototype.distance = function (b) {
-	        return Math.sqrt(Math.pow((b.x - this.x), 2) + Math.pow((b.y - this.y), 2));
-	    };
-	    Point.prototype.sub = function (x, y) {
-	        this.x -= x;
-	        this.y -= y;
-	        return this;
-	    };
-	    Point.prototype.sum = function (x, y) {
-	        this.x += x;
-	        this.y += y;
-	        return this;
-	    };
-	    Point.prototype.clone = function () {
-	        return new Point(this.x, this.y);
-	    };
-	    return Point;
-	}(PIXI.Point));
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = Point;
-
-
-/***/ },
+/* 9 */,
 /* 10 */,
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Point_1 = __webpack_require__(9);
-	var DraggableData = (function (_super) {
-	    __extends(DraggableData, _super);
-	    function DraggableData() {
-	        _super.call(this);
-	        this.enabled = false;
-	        this.eventsOnce = false;
-	        this.dragging = false;
-	        this.index = 0;
-	    }
-	    DraggableData.prototype.get = function (event) {
-	        return new Point_1.default(event.data.global.x, event.data.global.y);
-	    };
-	    DraggableData.prototype.getGap = function (event) {
-	        return this.get(event).sub(this.dragStart.x, this.dragStart.y);
-	    };
-	    return DraggableData;
-	}(Object));
-	exports.DraggableData = DraggableData;
-
-
-/***/ },
+/* 11 */,
 /* 12 */
 /***/ function(module, exports, __webpack_require__) {
 

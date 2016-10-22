@@ -9,7 +9,10 @@ export default class Renderer {
     constructor(screen: Screen) {
         this.engine = PIXI.autoDetectRenderer(
             screen.canvas.width,
-            screen.canvas.height, { view: screen.canvas }
+            screen.canvas.height, { 
+                view: screen.canvas,
+                antialias: true 
+            }
         )
     }
 
