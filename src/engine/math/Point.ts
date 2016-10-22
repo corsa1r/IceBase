@@ -1,27 +1,28 @@
-export default class Point {
+import * as PIXI from 'pixi.js';
 
-    public x: number;
-    public y: number;
+export default class Point extends PIXI.Point {
 
     constructor(x?: number, y?: number) {
-        this.set(x, y);
-    }
-
-    set(x: number = 0, y: number = 0): Point {
-        return this.copy(new Point(x, y));
-    }
-
-    clone(): Point {
-        return new Point(this.x, this.y);
+        super(x, y);
     }
 
     distance(b: Point): Number {
         return Math.sqrt(Math.pow((b.x - this.x), 2) + Math.pow((b.y - this.y), 2));
     }
 
-    copy(b: Point): Point {
-        this.x = b.x;
-        this.y = b.y;
+    sub(x: number, y: number): Point {
+        this.x -= x;
+        this.y -= y;
         return this;
+    }
+
+    sum(x: number, y: number): Point {
+        this.x += x;
+        this.y += y;
+        return this;
+    }
+
+    clone(): Point {
+        return new Point(this.x, this.y);
     }
 }

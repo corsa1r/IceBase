@@ -1,59 +1,19 @@
-export default class Container<T> extends Object {
+import * as PIXI from 'pixi.js';
 
-    private items: Array<T>;
-    private names: Array<string>;
+export default class Container extends PIXI.Container {
 
     constructor() {
         super();
     }
 
-    each(iterator: Function): Container<T> {
-        for (let i = 0, len = this.items.length; i < len; i++) {
-            if (iterator(this.items[i], this.names[i], i) === false) break;
+    each(iterator: Function): Container {
+        for (let i = 0, len = this.children.length; i < len; i++) {
+            if (iterator(this.children[i], i) === false) break;
         }
         return this;
     }
 
-    select(iterator: Function): Container<T> {
-        let found = new Container<T>();
-        this.each((item: T, name: string) => {
-            if (iterator(item, name) === true) found.add(item, name);
-        });
-        return found;
-    }
-
-    add(item: T, name?: string): Container<T> {
-        this.items.push(item);
-        this.names.push(name);
-        return this;
-    }
-
-    get(item: T | string): T | null {
-        let index = this.indexOf(item);
-        return this.items[index] || null;
-    }
-
-    has(what: T | string): Boolean {
-        if(this.length === 0) return false;
-        return this.indexOf(what) !== -1;
-    }
-
-    remove(item: T | string): Container<T> {
-        let index = this.indexOf(item);
-        this.items.splice(index, 1);
-        this.names.splice(index, 1);
-        return this;
-    }
-
-    indexOf(what: T | string): number {
-        if (typeof what === 'string') {
-            return this.names.indexOf(what);
-        } else {
-            return this.items.indexOf(what);
-        }
-    }
-
-    get length() {
-        return this.items.length;
+    len(): number {
+        return this.children.length;
     }
 }

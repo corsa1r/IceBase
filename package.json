@@ -13,5 +13,19 @@
     "typescript"
   ],
   "author": "CORSAIR <vladimir.corsair@gmail.com>",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/hammerjs": "^2.0.33",
+    "@types/pixi.js": "^3.0.30",
+    "brfs": "^1.4.3",
+    "browserify-versionify": "^1.0.6",
+    "ify-loader": "^1.0.3",
+    "transform-loader": "^0.2.3",
+    "ts-loader": "^0.9.5",
+    "typescript": "^2.0.3"
+  },
+  "dependencies": {
+    "hammerjs": "^2.0.8",
+    "pixi.js": "^3.0.9"
+  }
 }

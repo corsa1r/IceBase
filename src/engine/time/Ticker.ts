@@ -1,13 +1,22 @@
-import EventEmitter from '../events/EventEmitter';
+import * as EventEmitter from 'eventemitter3';
 
 export default class Ticker extends EventEmitter {
 
+    private fps: number;
     private clockId: number | null;
     private lastTime: number | null;
     private delta: number = 0;
+    private timescale: number = 1;
 
-    constructor(private fps: number = 1000 / 60) {
+    constructor(fps: number) {
         super();
+        this.fps = fps;
+        this.start();
+    }
+
+    scale(by: number): Ticker {
+        this.timescale = by;
+        return this;
     }
 
     start(): Ticker {
@@ -29,7 +38,7 @@ export default class Ticker extends EventEmitter {
 
     private tick() {
         let now: number = Date.now();
-        let delta = (now - this.lastTime) / 1000;
+        let delta = ((now - this.lastTime) / 1000) * this.timescale;
         this.lastTime = now;
         this.emit(Ticker.EVENTS.TICK, delta);
     }
@@ -38,5 +47,9 @@ export default class Ticker extends EventEmitter {
         TICK: 'tick',
         START: 'start',
         STOP: 'stop'
-    };
+    }
+
+    static DEFAULTS = {
+        FPS: 1000 / 60
+    }
 }
