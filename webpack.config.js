@@ -14,6 +14,7 @@ module.exports = {
         ]
     },
     externals: [
+        //set pixi as external util fixed by PIXI
         { "pixi.js": "PIXI" }
     ]
 }

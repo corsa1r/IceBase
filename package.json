@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "npm run server"
+    "build": "webpack",
+    "watch": "webpack -w"
   },
   "keywords": [
     "ice",

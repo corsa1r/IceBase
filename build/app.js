@@ -45,21 +45,41 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var Game_1 = __webpack_require__(13);
+	var Game_1 = __webpack_require__(1);
 	var canvas = document.getElementById('canvas');
 	var game = new Game_1.default(canvas);
 
 
 /***/ },
 /* 1 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
-	module.exports = PIXI;
+	"use strict";
+	var Screen_1 = __webpack_require__(2);
+	var Renderer_1 = __webpack_require__(3);
+	var Ticker_1 = __webpack_require__(5);
+	var Stage_1 = __webpack_require__(7);
+	var Game = (function () {
+	    function Game(canvas) {
+	        var _this = this;
+	        this.screen = new Screen_1.default(canvas);
+	        this.renderer = new Renderer_1.default(this.screen);
+	        this.stage = new Stage_1.default();
+	        this.ticker = new Ticker_1.default(Ticker_1.default.DEFAULTS.FPS);
+	        this.ticker.on(Ticker_1.default.EVENTS.TICK, function (delta) { return _this.tick(delta); });
+	    }
+	    Game.prototype.tick = function (delta) {
+	        this.stage.update(delta);
+	        this.renderer.draw(this.stage);
+	    };
+	    return Game;
+	}());
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = Game;
+
 
 /***/ },
-/* 2 */,
-/* 3 */,
-/* 4 */
+/* 2 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -74,11 +94,11 @@
 
 
 /***/ },
-/* 5 */
+/* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var PIXI = __webpack_require__(1);
+	var PIXI = __webpack_require__(4);
 	var Renderer = (function () {
 	    function Renderer(screen) {
 	        this.engine = PIXI.autoDetectRenderer(screen.canvas.width, screen.canvas.height, {
@@ -96,47 +116,13 @@
 
 
 /***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/* 4 */
+/***/ function(module, exports) {
 
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Container_1 = __webpack_require__(12);
-	var Stage = (function (_super) {
-	    __extends(Stage, _super);
-	    function Stage() {
-	        _super.call(this);
-	        this.interactive = true;
-	    }
-	    Stage.prototype.addChild = function () {
-	        var childs = [];
-	        for (var _i = 0; _i < arguments.length; _i++) {
-	            childs[_i - 0] = arguments[_i];
-	        }
-	        _super.prototype.addChild.apply(this, childs);
-	        return this;
-	    };
-	    Stage.prototype.update = function (delta) {
-	        //update all childs and their components first
-	        this.each(function (child) {
-	            child.components.forEach(function (describe) {
-	                describe.component.update(delta);
-	            });
-	            child.update(delta);
-	        });
-	    };
-	    return Stage;
-	}(Container_1.default));
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = Stage;
-
+	module.exports = PIXI;
 
 /***/ },
-/* 7 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -145,7 +131,7 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var EventEmitter = __webpack_require__(8);
+	var EventEmitter = __webpack_require__(6);
 	var Ticker = (function (_super) {
 	    __extends(Ticker, _super);
 	    function Ticker(fps) {
@@ -198,7 +184,7 @@
 
 
 /***/ },
-/* 8 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -493,10 +479,7 @@
 
 
 /***/ },
-/* 9 */,
-/* 10 */,
-/* 11 */,
-/* 12 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -505,7 +488,47 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var PIXI = __webpack_require__(1);
+	var Container_1 = __webpack_require__(8);
+	var Stage = (function (_super) {
+	    __extends(Stage, _super);
+	    function Stage() {
+	        _super.call(this);
+	        this.interactive = true;
+	    }
+	    Stage.prototype.addChild = function () {
+	        var childs = [];
+	        for (var _i = 0; _i < arguments.length; _i++) {
+	            childs[_i - 0] = arguments[_i];
+	        }
+	        _super.prototype.addChild.apply(this, childs);
+	        return this;
+	    };
+	    Stage.prototype.update = function (delta) {
+	        //update all childs and their components first
+	        this.each(function (child) {
+	            child.components.forEach(function (describe) {
+	                describe.component.update(delta);
+	            });
+	            child.update(delta);
+	        });
+	    };
+	    return Stage;
+	}(Container_1.default));
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = Stage;
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var PIXI = __webpack_require__(4);
 	var Container = (function (_super) {
 	    __extends(Container, _super);
 	    function Container() {
@@ -525,34 +548,6 @@
 	}(PIXI.Container));
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = Container;
-
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var Screen_1 = __webpack_require__(4);
-	var Renderer_1 = __webpack_require__(5);
-	var Ticker_1 = __webpack_require__(7);
-	var Stage_1 = __webpack_require__(6);
-	var Game = (function () {
-	    function Game(canvas) {
-	        var _this = this;
-	        this.screen = new Screen_1.default(canvas);
-	        this.renderer = new Renderer_1.default(this.screen);
-	        this.stage = new Stage_1.default();
-	        this.ticker = new Ticker_1.default(Ticker_1.default.DEFAULTS.FPS);
-	        this.ticker.on(Ticker_1.default.EVENTS.TICK, function (delta) { return _this.tick(delta); });
-	    }
-	    Game.prototype.tick = function (delta) {
-	        this.stage.update(delta);
-	        this.renderer.draw(this.stage);
-	    };
-	    return Game;
-	}());
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = Game;
 
 
 /***/ }
