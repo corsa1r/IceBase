@@ -1,7 +1,10 @@
 import * as PIXI from 'pixi.js';
+import Point from '../math/Point';
 
 export default class Container extends PIXI.Container {
 
+    public position: Point = new Point();
+    
     constructor() {
         super();
     }

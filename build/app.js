@@ -45,9 +45,52 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
 	var Game_1 = __webpack_require__(1);
+	var GameObject_1 = __webpack_require__(6);
+	var PIXI = __webpack_require__(4);
 	var canvas = document.getElementById('canvas');
 	var game = new Game_1.default(canvas);
+	window['camera'] = game.camera;
+	var Box = (function (_super) {
+	    __extends(Box, _super);
+	    function Box(c, w, h, ground) {
+	        if (ground === void 0) { ground = false; }
+	        _super.call(this);
+	        this.ground = ground;
+	        var box = new PIXI.Graphics();
+	        box.beginFill(c);
+	        box.drawRect(0, 0, w, h);
+	        box.endFill();
+	        this.addChild(box);
+	        this.setDraggable(true);
+	    }
+	    Box.prototype.update = function (delta) {
+	        if (!this.ground) {
+	            if (!this.draggableData.dragging) {
+	                this.position.y += 1;
+	            }
+	            if (this.position.y > 300) {
+	                this.position.y = 300;
+	            }
+	        }
+	        return this;
+	    };
+	    return Box;
+	}(GameObject_1.default));
+	var box = new Box(0x007b90, 100, 100);
+	var ground = new Box(0x997b10, 500, 10, true);
+	ground.position.y = 400;
+	game.stage.addChild(box);
+	game.stage.addChild(ground);
+	game.camera.follow(box);
+	setInterval(function () {
+	    game.camera.sees(ground);
+	}, 100);
 
 
 /***/ },
@@ -56,19 +99,23 @@
 
 	"use strict";
 	var Screen_1 = __webpack_require__(2);
-	var Renderer_1 = __webpack_require__(3);
-	var Ticker_1 = __webpack_require__(5);
-	var Stage_1 = __webpack_require__(7);
+	var Renderer_1 = __webpack_require__(10);
+	var Ticker_1 = __webpack_require__(11);
+	var Stage_1 = __webpack_require__(13);
+	var Camera_1 = __webpack_require__(5);
 	var Game = (function () {
 	    function Game(canvas) {
 	        var _this = this;
 	        this.screen = new Screen_1.default(canvas);
+	        this.camera = new Camera_1.default(this.screen);
 	        this.renderer = new Renderer_1.default(this.screen);
-	        this.stage = new Stage_1.default();
+	        this.stage = new Stage_1.default(this.camera);
+	        this.stage.addChild(this.camera);
 	        this.ticker = new Ticker_1.default(Ticker_1.default.DEFAULTS.FPS);
 	        this.ticker.on(Ticker_1.default.EVENTS.TICK, function (delta) { return _this.tick(delta); });
 	    }
 	    Game.prototype.tick = function (delta) {
+	        this.stage.position = this.camera.position;
 	        this.stage.update(delta);
 	        this.renderer.draw(this.stage);
 	    };
@@ -80,13 +127,19 @@
 
 /***/ },
 /* 2 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var Point_1 = __webpack_require__(3);
 	var Screen = (function () {
 	    function Screen(canvas) {
 	        this.canvas = canvas;
 	    }
+	    Screen.prototype.resize = function (width, height) {
+	        this.size = new Point_1.default(width, height).toInt();
+	        this.halfSize = this.size.clone().dev(2).toInt();
+	        return this;
+	    };
 	    return Screen;
 	}());
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -98,21 +151,80 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
 	var PIXI = __webpack_require__(4);
-	var Renderer = (function () {
-	    function Renderer(screen) {
-	        this.engine = PIXI.autoDetectRenderer(screen.canvas.width, screen.canvas.height, {
-	            view: screen.canvas,
-	            antialias: true
-	        });
+	var Point = (function (_super) {
+	    __extends(Point, _super);
+	    function Point(x, y) {
+	        _super.call(this, x, y);
 	    }
-	    Renderer.prototype.draw = function (stage) {
-	        this.engine.render(stage);
+	    Point.prototype.distance = function (b) {
+	        return Math.sqrt(Math.pow((b.x - this.x), 2) + Math.pow((b.y - this.y), 2));
 	    };
-	    return Renderer;
-	}());
+	    Point.prototype.sub = function (x, y) {
+	        if (x instanceof Point) {
+	            return this.sub(x.x, x.y);
+	        }
+	        else {
+	            this.x -= x;
+	            this.y -= isNaN(y) ? 0 : y;
+	        }
+	        return this;
+	    };
+	    Point.prototype.sum = function (x, y) {
+	        if (x instanceof Point) {
+	            return this.sum(x.x, x.y);
+	        }
+	        else {
+	            this.x += x;
+	            this.y += isNaN(y) ? 0 : y;
+	        }
+	        return this;
+	    };
+	    Point.prototype.clone = function () {
+	        return new Point(this.x, this.y);
+	    };
+	    Point.prototype.dev = function (by) {
+	        this.x /= by;
+	        this.y /= by;
+	        return this;
+	    };
+	    Point.prototype.mul = function (by) {
+	        this.x *= by;
+	        this.y *= by;
+	        return this;
+	    };
+	    Point.prototype.toInt = function () {
+	        this.x = this.x >> 0;
+	        this.y = this.x >> 0;
+	        return this;
+	    };
+	    Point.prototype.lerpX = function (to, mul) {
+	        if (mul === void 0) { mul = 1; }
+	        mul = mul < 0 ? 0 : mul;
+	        mul = mul > 1 ? 1 : mul;
+	        return this.x + (to - this.x) * mul;
+	    };
+	    Point.prototype.lerpY = function (to, mul) {
+	        if (mul === void 0) { mul = 1; }
+	        mul = mul < 0 ? 0 : mul;
+	        mul = mul > 1 ? 1 : mul;
+	        return this.y + (to - this.y) * mul;
+	    };
+	    Point.prototype.lerp = function (to, mul) {
+	        if (mul === void 0) { mul = 1; }
+	        this.lerpX(to.x, mul);
+	        this.lerpY(to.y, mul);
+	        return this;
+	    };
+	    return Point;
+	}(PIXI.Point));
 	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = Renderer;
+	exports.default = Point;
 
 
 /***/ },
@@ -131,7 +243,309 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var EventEmitter = __webpack_require__(6);
+	var Point_1 = __webpack_require__(3);
+	var GameObject_1 = __webpack_require__(6);
+	var Camera = (function (_super) {
+	    __extends(Camera, _super);
+	    function Camera(screen) {
+	        _super.call(this);
+	        this.position = new Point_1.default();
+	        this.screen = screen;
+	    }
+	    Camera.prototype.sees = function (target) {
+	        //followed object is always visible
+	        if (target === this.followTarget)
+	            true;
+	        //translate camera position to normal canvas viewport
+	        var selfPosition = this.position.clone().mul(-1);
+	        var targetPosition = target.position.clone();
+	        var camRelPosition = targetPosition.sub(selfPosition);
+	        //if detects square collision the target is visible
+	        var c1 = camRelPosition.y < this.screen.canvas.height;
+	        var c2 = camRelPosition.y + target.height > 0;
+	        var c3 = camRelPosition.x + target.width > 0;
+	        var c4 = camRelPosition.x < this.screen.canvas.width;
+	        return c1 && c2 && c3 && c4;
+	    };
+	    Camera.prototype.follow = function (target) {
+	        this.followTarget = target;
+	        return this;
+	    };
+	    Camera.prototype.stopFollow = function () {
+	        this.followTarget = null;
+	        return this;
+	    };
+	    Camera.prototype.update = function (delta) {
+	        if (!this.followTarget)
+	            return this;
+	        this.position = this.followTarget.position
+	            .clone().sub(this.screen.halfSize).mul(-1)
+	            .sub(this.followTarget.width / 2, this.followTarget.height / 2);
+	        return this;
+	    };
+	    return Camera;
+	}(GameObject_1.default));
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = Camera;
+
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Container_1 = __webpack_require__(7);
+	var Component_1 = __webpack_require__(8);
+	var DraggableData_1 = __webpack_require__(9);
+	var GameObject = (function (_super) {
+	    __extends(GameObject, _super);
+	    function GameObject() {
+	        _super.call(this);
+	        this.draggableData = new DraggableData_1.DraggableData();
+	        this.components = [];
+	        this.interactive = true;
+	    }
+	    GameObject.prototype.addComponent = function (component) {
+	        component.parent = this;
+	        this.components.push(Component_1.default.describe(component));
+	        this.addChild(component);
+	        return component;
+	    };
+	    GameObject.prototype.removeComponent = function (component) {
+	        var index = this.components.indexOf(Component_1.default.describe(component));
+	        this.components.splice(index, 1);
+	        this.removeChild(component);
+	        return component;
+	    };
+	    GameObject.prototype.update = function (delta) {
+	        return this;
+	    };
+	    GameObject.prototype.setDraggable = function (state) {
+	        if (state === void 0) { state = true; }
+	        if (state && !this.draggableData.eventsOnce)
+	            this.initDragEvents();
+	        if (!state)
+	            this.onDragEnd();
+	        this.draggableData.enabled = state;
+	        return this;
+	    };
+	    GameObject.prototype.initDragEvents = function () {
+	        var _this = this;
+	        this.draggableData.eventsOnce = true;
+	        // events for drag start
+	        this.on(GameObject.EVENTS.MOUSEDOWN, function (e) { return _this.onDragStart(e); });
+	        this.on(GameObject.EVENTS.TOUCHSTART, function (e) { return _this.onDragStart(e); });
+	        // events for drag end
+	        this.on(GameObject.EVENTS.MOUSEUP, function () { return _this.onDragEnd(); });
+	        this.on(GameObject.EVENTS.MOUSEUPOUTSIDE, function () { return _this.onDragEnd(); });
+	        this.on(GameObject.EVENTS.TOUCHEND, function () { return _this.onDragEnd(); });
+	        this.on(GameObject.EVENTS.TOUCHENDOUTSIDE, function () { return _this.onDragEnd(); });
+	        // events for drag move
+	        this.on(GameObject.EVENTS.MOUSEMOVE, function (e) { return _this.onDragMove(e); });
+	        this.on(GameObject.EVENTS.TOUCHMOVE, function (e) { return _this.onDragMove(e); });
+	    };
+	    GameObject.prototype.onDragStart = function (event) {
+	        if (!this.draggableData.enabled)
+	            return;
+	        this.draggableData.dragStart = this.draggableData.get(event)
+	            .clone().sub(this.position.x, this.position.y);
+	        this.draggableData.dragging = true;
+	        if (this.draggableData.index) {
+	            this.emit(GameObject.EVENTS.DRAGSTART);
+	            this.dragstart();
+	        }
+	    };
+	    GameObject.prototype.onDragMove = function (event) {
+	        if (!this.draggableData.enabled)
+	            return;
+	        if (!this.draggableData.dragging)
+	            return;
+	        this.position.copy(this.draggableData.getGap(event));
+	        this.emit(GameObject.EVENTS.DRAG);
+	        this.drag();
+	        this.draggableData.index++;
+	        if (this.draggableData.index === 1) {
+	            this.emit(GameObject.EVENTS.DRAGSTART);
+	            this.dragstart();
+	        }
+	    };
+	    GameObject.prototype.onDragEnd = function () {
+	        if (!this.draggableData.enabled)
+	            return;
+	        this.draggableData.dragging = false;
+	        this.emit(GameObject.EVENTS.DRAGEND);
+	        this.dragend();
+	        this.draggableData.index = 0;
+	    };
+	    //@abstract methods
+	    GameObject.prototype.dragstart = function () { };
+	    GameObject.prototype.drag = function () { };
+	    GameObject.prototype.dragend = function () { };
+	    GameObject.EVENTS = {
+	        DRAGSTART: 'dragstart',
+	        DRAG: 'drag',
+	        DRAGEND: 'dragend',
+	        MOUSEDOWN: 'mousedown',
+	        TOUCHSTART: 'touchstart',
+	        MOUSEUP: 'mouseup',
+	        MOUSEUPOUTSIDE: 'mouseupoutside',
+	        TOUCHEND: 'touchend',
+	        TOUCHENDOUTSIDE: 'touchendoutside',
+	        MOUSEMOVE: 'mousemove',
+	        TOUCHMOVE: 'touchmove',
+	        CLICK: 'click',
+	        TAP: 'tap'
+	    };
+	    return GameObject;
+	}(Container_1.default));
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = GameObject;
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var PIXI = __webpack_require__(4);
+	var Point_1 = __webpack_require__(3);
+	var Container = (function (_super) {
+	    __extends(Container, _super);
+	    function Container() {
+	        _super.call(this);
+	        this.position = new Point_1.default();
+	    }
+	    Container.prototype.each = function (iterator) {
+	        for (var i = 0, len = this.children.length; i < len; i++) {
+	            if (iterator(this.children[i], i) === false)
+	                break;
+	        }
+	        return this;
+	    };
+	    Container.prototype.len = function () {
+	        return this.children.length;
+	    };
+	    return Container;
+	}(PIXI.Container));
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = Container;
+
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Container_1 = __webpack_require__(7);
+	var Component = (function (_super) {
+	    __extends(Component, _super);
+	    function Component(name) {
+	        _super.call(this);
+	        this.name = name;
+	    }
+	    Component.prototype.update = function (delta) {
+	        return this;
+	    };
+	    Component.describe = function (component) {
+	        var describe = {
+	            name: component.name,
+	            component: component
+	        };
+	        return describe;
+	    };
+	    return Component;
+	}(Container_1.default));
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = Component;
+
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Point_1 = __webpack_require__(3);
+	var DraggableData = (function (_super) {
+	    __extends(DraggableData, _super);
+	    function DraggableData() {
+	        _super.call(this);
+	        this.enabled = false;
+	        this.eventsOnce = false;
+	        this.dragging = false;
+	        this.index = 0;
+	    }
+	    DraggableData.prototype.get = function (event) {
+	        return new Point_1.default(event.data.global.x, event.data.global.y);
+	    };
+	    DraggableData.prototype.getGap = function (event) {
+	        return this.get(event).sub(this.dragStart.x, this.dragStart.y);
+	    };
+	    return DraggableData;
+	}(Object));
+	exports.DraggableData = DraggableData;
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var PIXI = __webpack_require__(4);
+	var Renderer = (function () {
+	    function Renderer(screen) {
+	        this.screen = screen;
+	        this.engine = PIXI.autoDetectRenderer(this.screen.canvas.width, this.screen.canvas.height, {
+	            view: this.screen.canvas,
+	            antialias: true
+	        });
+	        this.resize(this.screen.canvas.width, this.screen.canvas.height);
+	    }
+	    Renderer.prototype.draw = function (stage) {
+	        this.engine.render(stage);
+	        return this;
+	    };
+	    Renderer.prototype.resize = function (width, height) {
+	        this.screen.resize(width, height);
+	        this.engine.resize(this.screen.size.x, this.screen.size.y);
+	        return this;
+	    };
+	    return Renderer;
+	}());
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = Renderer;
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var EventEmitter = __webpack_require__(12);
 	var Ticker = (function (_super) {
 	    __extends(Ticker, _super);
 	    function Ticker(fps) {
@@ -184,7 +598,7 @@
 
 
 /***/ },
-/* 6 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -479,7 +893,7 @@
 
 
 /***/ },
-/* 7 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -488,11 +902,12 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Container_1 = __webpack_require__(8);
+	var Container_1 = __webpack_require__(7);
 	var Stage = (function (_super) {
 	    __extends(Stage, _super);
-	    function Stage() {
+	    function Stage(camera) {
 	        _super.call(this);
+	        this.camera = camera;
 	        this.interactive = true;
 	    }
 	    Stage.prototype.addChild = function () {
@@ -504,11 +919,15 @@
 	        return this;
 	    };
 	    Stage.prototype.update = function (delta) {
-	        //update all childs and their components first
-	        this.each(function (child) {
+	        var _this = this;
+	        this.each(function (child, index) {
+	            //skip rendering if camera doesn't sees the child
+	            child.visible = _this.camera.sees(child);
+	            //update their components first
 	            child.components.forEach(function (describe) {
 	                describe.component.update(delta);
 	            });
+	            //finally update the child
 	            child.update(delta);
 	        });
 	    };
@@ -516,38 +935,6 @@
 	}(Container_1.default));
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = Stage;
-
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var PIXI = __webpack_require__(4);
-	var Container = (function (_super) {
-	    __extends(Container, _super);
-	    function Container() {
-	        _super.call(this);
-	    }
-	    Container.prototype.each = function (iterator) {
-	        for (var i = 0, len = this.children.length; i < len; i++) {
-	            if (iterator(this.children[i], i) === false)
-	                break;
-	        }
-	        return this;
-	    };
-	    Container.prototype.len = function () {
-	        return this.children.length;
-	    };
-	    return Container;
-	}(PIXI.Container));
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = Container;
 
 
 /***/ }

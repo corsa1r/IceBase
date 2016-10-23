@@ -9,7 +9,6 @@ export default class GameObject extends Container {
 
     protected draggableData: DraggableData = new DraggableData();
     public components: Array<iComponentsDescribe> = [];
-    public position: Point = new Point();
 
     constructor() {
         super();
