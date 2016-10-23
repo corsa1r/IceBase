@@ -53,44 +53,48 @@
 	var Game_1 = __webpack_require__(1);
 	var GameObject_1 = __webpack_require__(6);
 	var PIXI = __webpack_require__(4);
+	var Point_1 = __webpack_require__(3);
 	var canvas = document.getElementById('canvas');
 	var game = new Game_1.default(canvas);
-	window['camera'] = game.camera;
-	var Box = (function (_super) {
-	    __extends(Box, _super);
-	    function Box(c, w, h, ground) {
-	        if (ground === void 0) { ground = false; }
+	var Ball = (function (_super) {
+	    __extends(Ball, _super);
+	    function Ball(canvas) {
 	        _super.call(this);
-	        this.ground = ground;
-	        var box = new PIXI.Graphics();
-	        box.beginFill(c);
-	        box.drawRect(0, 0, w, h);
-	        box.endFill();
-	        this.addChild(box);
-	        this.setDraggable(true);
+	        this.position.x = 100;
+	        this.position.y = 100;
+	        this.velocity = new Point_1.default(2, 3);
+	        this.directions = new Point_1.default(1, 1);
+	        this.canvas = canvas;
+	        this.graphics = new PIXI.Graphics();
+	        this.graphics.beginFill(0x007b90);
+	        this.graphics.drawCircle(0, 0, 50);
+	        this.graphics.endFill();
+	        this.addChild(this.graphics);
 	    }
-	    Box.prototype.update = function (delta) {
-	        if (!this.ground) {
-	            if (!this.draggableData.dragging) {
-	                this.position.y += 1;
-	            }
-	            if (this.position.y > 300) {
-	                this.position.y = 300;
-	            }
+	    Ball.prototype.update = function (delta) {
+	        this.position.x += this.velocity.x * this.directions.x;
+	        this.position.y += this.velocity.y * this.directions.y;
+	        if (this.position.x + this.width / 2 > this.canvas.width) {
+	            this.directions.x *= -1;
+	            this.velocity.x += 1;
+	        }
+	        if (this.position.x - this.width / 2 < 0) {
+	            this.directions.x *= -1;
+	            this.velocity.x += 1;
+	        }
+	        if (this.position.y + this.height / 2 > this.canvas.height) {
+	            this.directions.y *= -1;
+	            this.velocity.y += 1;
+	        }
+	        if (this.position.y - this.height / 2 < 0) {
+	            this.directions.y *= -1;
+	            this.velocity.y += 1;
 	        }
 	        return this;
 	    };
-	    return Box;
+	    return Ball;
 	}(GameObject_1.default));
-	var box = new Box(0x007b90, 100, 100);
-	var ground = new Box(0x997b10, 500, 10, true);
-	ground.position.y = 400;
-	game.stage.addChild(box);
-	game.stage.addChild(ground);
-	game.camera.follow(box);
-	setInterval(function () {
-	    game.camera.sees(ground);
-	}, 100);
+	game.stage.addChild(new Ball(game.screen.canvas));
 
 
 /***/ },

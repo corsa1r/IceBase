@@ -1,47 +1,55 @@
 import Game from './engine/Game';
 import GameObject from './engine/gameobject/GameObject';
 import * as PIXI from 'pixi.js';
+import Point from './engine/math/Point';
 
 let canvas = <HTMLCanvasElement>document.getElementById('canvas');
 let game = new Game(canvas);
 
-window['camera'] = game.camera;
+class Ball extends GameObject {
 
-class Box extends GameObject {
-    private ground: boolean;
-    constructor(c: number, w: number, h: number, ground: boolean = false) {
+    private graphics: PIXI.Graphics;
+    private canvas: HTMLCanvasElement;
+    private velocity: Point;
+    private directions: Point;
+
+    constructor(canvas: HTMLCanvasElement) {
         super();
-        this.ground = ground;
-        let box = new PIXI.Graphics();
-        box.beginFill(c);
-        box.drawRect(0, 0, w, h);
-        box.endFill();
-
-        this.addChild(box);
-        this.setDraggable(true);
+        this.position.x = 100;
+        this.position.y = 100;
+        this.velocity = new Point(2, 3);
+        this.directions = new Point(1, 1);
+        this.canvas = canvas;
+        this.graphics = new PIXI.Graphics();
+        this.graphics.beginFill(0x007b90);
+        this.graphics.drawCircle(0, 0, 50);
+        this.graphics.endFill();
+        this.addChild(this.graphics);
     }
 
     update(delta: number) {
-        if (!this.ground) {
-            if (!this.draggableData.dragging) {
-                this.position.y += 1;
-            }
-            if (this.position.y > 300) {
-                this.position.y = 300;
-            }
+        this.position.x += this.velocity.x * this.directions.x;
+        this.position.y += this.velocity.y * this.directions.y;
+
+        if (this.position.x + this.width / 2 > this.canvas.width) {
+            this.directions.x *= -1;
+            this.velocity.x += 1;
+        }
+        if (this.position.x - this.width / 2 < 0) {
+            this.directions.x *= -1;
+            this.velocity.x += 1;
+        }
+        if (this.position.y + this.height / 2 > this.canvas.height) {
+            this.directions.y *= -1;
+            this.velocity.y += 1;
+        }
+        if (this.position.y - this.height / 2 < 0) {
+            this.directions.y *= -1;
+            this.velocity.y += 1;
         }
         return this;
     }
+
 }
 
-let box = new Box(0x007b90, 100, 100);
-let ground = new Box(0x997b10, 500, 10, true);
-ground.position.y = 400;
-game.stage.addChild(box);
-game.stage.addChild(ground);
-
-game.camera.follow(box);
-
-setInterval(() => {
-    game.camera.sees(ground);
-}, 100)
+game.stage.addChild(new Ball(game.screen.canvas));
