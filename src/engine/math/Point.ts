@@ -48,7 +48,7 @@ export default class Point extends PIXI.Point {
 
     toInt(): Point {
         this.x = this.x >> 0;
-        this.y = this.x >> 0;
+        this.y = this.y >> 0;
         return this;
     }
 

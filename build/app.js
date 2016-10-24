@@ -51,9 +51,10 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var Game_1 = __webpack_require__(1);
-	var GameObject_1 = __webpack_require__(11);
+	var GameObject_1 = __webpack_require__(14);
 	var PIXI = __webpack_require__(4);
 	var Point_1 = __webpack_require__(3);
+	var Container_1 = __webpack_require__(12);
 	var canvas = document.getElementById('canvas');
 	var game = new Game_1.default(canvas);
 	var Ground = (function (_super) {
@@ -62,7 +63,7 @@
 	        _super.call(this);
 	        this.view = new PIXI.Graphics();
 	        this.view.beginFill(0x006800);
-	        this.view.drawRect(0, 0, 10000, 5);
+	        this.view.drawRect(0, 0, 100000, 520);
 	        this.view.endFill();
 	        this.addChild(this.view);
 	        this.position.x = -5000;
@@ -84,7 +85,7 @@
 	        this.addChild(this.view);
 	    }
 	    Player.prototype.update = function (delta) {
-	        this.velocity.sum(0, 0.2);
+	        this.velocity.sum(0, 0.4);
 	        this.position.y += this.velocity.y;
 	        this.grounded = false;
 	        if (this.position.y + this.height > this.ground.position.y) {
@@ -112,11 +113,35 @@
 	    };
 	    return Player;
 	}(GameObject_1.default));
+	var Tree = (function (_super) {
+	    __extends(Tree, _super);
+	    function Tree(ground, x) {
+	        _super.call(this);
+	        this.view = new Container_1.default;
+	        this.ground = ground;
+	        var h = new PIXI.Graphics();
+	        h.beginFill(0x774c02);
+	        h.drawRect(0, 0, 30, Math.random() * 200 + 193);
+	        h.beginFill(0x1bc652);
+	        h.drawCircle(15, 0, 100);
+	        //h.alpha = 0.5;
+	        h.endFill();
+	        this.view.addChild(h);
+	        this.addChild(this.view);
+	        this.position.x = x;
+	        this.position.y = this.ground.position.y - this.height + 100;
+	    }
+	    return Tree;
+	}(GameObject_1.default));
 	var ground = new Ground();
 	var player = new Player(ground);
 	game.stage.addChild(ground);
+	for (var i = 0; i < 300; i++) {
+	    game.stage.addChild(new Tree(ground, i * 400));
+	}
 	game.stage.addChild(player);
-	game.camera.follow(player, 0.3);
+	game.camera.follow(player, .1);
+	game.renderer.resize(window.innerWidth, window.innerHeight);
 
 
 /***/ },
@@ -128,8 +153,8 @@
 	var Renderer_1 = __webpack_require__(5);
 	var Ticker_1 = __webpack_require__(6);
 	var Stage_1 = __webpack_require__(8);
-	var Camera_1 = __webpack_require__(10);
-	var Keyboard_1 = __webpack_require__(14);
+	var Camera_1 = __webpack_require__(13);
+	var Keyboard_1 = __webpack_require__(9);
 	var Game = (function () {
 	    function Game(canvas) {
 	        var _this = this;
@@ -229,7 +254,7 @@
 	    };
 	    Point.prototype.toInt = function () {
 	        this.x = this.x >> 0;
-	        this.y = this.x >> 0;
+	        this.y = this.y >> 0;
 	        return this;
 	    };
 	    Point.prototype.lerpX = function (to, mul) {
@@ -657,8 +682,8 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var Keyboard_1 = __webpack_require__(14);
-	var Container_1 = __webpack_require__(9);
+	var Keyboard_1 = __webpack_require__(9);
+	var Container_1 = __webpack_require__(12);
 	var Stage = (function (_super) {
 	    __extends(Stage, _super);
 	    function Stage(camera) {
@@ -716,281 +741,8 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var PIXI = __webpack_require__(4);
-	var Point_1 = __webpack_require__(3);
-	var Container = (function (_super) {
-	    __extends(Container, _super);
-	    function Container() {
-	        _super.call(this);
-	        this.position = new Point_1.default();
-	    }
-	    Container.prototype.each = function (iterator) {
-	        for (var i = 0, len = this.children.length; i < len; i++) {
-	            if (iterator(this.children[i], i) === false)
-	                break;
-	        }
-	        return this;
-	    };
-	    Container.prototype.len = function () {
-	        return this.children.length;
-	    };
-	    return Container;
-	}(PIXI.Container));
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = Container;
-
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Point_1 = __webpack_require__(3);
-	var GameObject_1 = __webpack_require__(11);
-	var Camera = (function (_super) {
-	    __extends(Camera, _super);
-	    function Camera(screen) {
-	        _super.call(this);
-	        this.position = new Point_1.default();
-	        this.followSpeed = 1;
-	        this.screen = screen;
-	    }
-	    Camera.prototype.sees = function (target) {
-	        //followed object is always visible
-	        if (target === this.followTarget)
-	            true;
-	        //translate camera position to normal canvas viewport
-	        var selfPosition = this.position.clone().mul(-1);
-	        var targetPosition = target.position.clone();
-	        var camRelPosition = targetPosition.sub(selfPosition);
-	        //if detects square collision the target is visible
-	        var c1 = camRelPosition.y < this.screen.canvas.height;
-	        var c2 = camRelPosition.y + target.height > 0;
-	        var c3 = camRelPosition.x + target.width > 0;
-	        var c4 = camRelPosition.x < this.screen.canvas.width;
-	        return c1 && c2 && c3 && c4;
-	    };
-	    Camera.prototype.follow = function (target, speed) {
-	        if (speed === void 0) { speed = 1; }
-	        this.followTarget = target;
-	        this.followSpeed = speed;
-	        return this;
-	    };
-	    Camera.prototype.stopFollow = function () {
-	        this.followTarget = null;
-	        return this;
-	    };
-	    Camera.prototype.update = function (delta) {
-	        if (!this.followTarget)
-	            return this;
-	        var lerpTo = this.followTarget.position
-	            .clone().sub(this.screen.halfSize).mul(-1)
-	            .sub(this.followTarget.width >> 1, this.followTarget.height >> 1);
-	        this.position.lerp(lerpTo, this.followSpeed);
-	        return this;
-	    };
-	    return Camera;
-	}(GameObject_1.default));
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = Camera;
-
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Container_1 = __webpack_require__(9);
-	var Component_1 = __webpack_require__(12);
-	var DraggableData_1 = __webpack_require__(13);
-	var GameObject = (function (_super) {
-	    __extends(GameObject, _super);
-	    function GameObject() {
-	        _super.call(this);
-	        this.draggableData = new DraggableData_1.DraggableData();
-	        this.states = {};
-	        this.components = [];
-	        this.interactive = true;
-	    }
-	    GameObject.prototype.addComponent = function (component) {
-	        this.components.push(Component_1.default.describe(component));
-	        this.addChild(component);
-	        return component;
-	    };
-	    GameObject.prototype.removeComponent = function (component) {
-	        var index = this.components.indexOf(Component_1.default.describe(component));
-	        this.components.splice(index, 1);
-	        this.removeChild(component);
-	        return component;
-	    };
-	    GameObject.prototype.update = function (delta) {
-	        return this;
-	    };
-	    GameObject.prototype.setDraggable = function (state) {
-	        if (state === void 0) { state = true; }
-	        if (state && !this.draggableData.eventsOnce)
-	            this.initDragEvents();
-	        if (!state)
-	            this.onDragEnd();
-	        this.draggableData.enabled = state;
-	        return this;
-	    };
-	    GameObject.prototype.initDragEvents = function () {
-	        var _this = this;
-	        this.draggableData.eventsOnce = true;
-	        // events for drag start
-	        this.on(GameObject.EVENTS.MOUSEDOWN, function (e) { return _this.onDragStart(e); });
-	        this.on(GameObject.EVENTS.TOUCHSTART, function (e) { return _this.onDragStart(e); });
-	        // events for drag end
-	        this.on(GameObject.EVENTS.MOUSEUP, function () { return _this.onDragEnd(); });
-	        this.on(GameObject.EVENTS.MOUSEUPOUTSIDE, function () { return _this.onDragEnd(); });
-	        this.on(GameObject.EVENTS.TOUCHEND, function () { return _this.onDragEnd(); });
-	        this.on(GameObject.EVENTS.TOUCHENDOUTSIDE, function () { return _this.onDragEnd(); });
-	        // events for drag move
-	        this.on(GameObject.EVENTS.MOUSEMOVE, function (e) { return _this.onDragMove(e); });
-	        this.on(GameObject.EVENTS.TOUCHMOVE, function (e) { return _this.onDragMove(e); });
-	    };
-	    GameObject.prototype.onDragStart = function (event) {
-	        if (!this.draggableData.enabled)
-	            return;
-	        this.draggableData.dragStart = this.draggableData.get(event)
-	            .clone().sub(this.position.x, this.position.y);
-	        this.draggableData.dragging = true;
-	        if (this.draggableData.index)
-	            this.dragstart();
-	    };
-	    GameObject.prototype.onDragMove = function (event) {
-	        if (!this.draggableData.enabled)
-	            return;
-	        if (!this.draggableData.dragging)
-	            return;
-	        this.position.copy(this.draggableData.getGap(event));
-	        this.drag();
-	        this.draggableData.index++;
-	        if (this.draggableData.index === 1)
-	            this.dragstart();
-	    };
-	    GameObject.prototype.onDragEnd = function () {
-	        if (!this.draggableData.enabled)
-	            return;
-	        this.draggableData.dragging = false;
-	        this.dragend();
-	        this.draggableData.index = 0;
-	    };
-	    //@abstract methods
-	    GameObject.prototype.dragstart = function () { return this; };
-	    GameObject.prototype.drag = function () { return this; };
-	    GameObject.prototype.dragend = function () { return this; };
-	    GameObject.prototype.keyup = function (event) { return this; };
-	    GameObject.prototype.key = function (event) { return this; };
-	    GameObject.prototype.keydown = function (event) { return this; };
-	    GameObject.EVENTS = {
-	        DRAGSTART: 'dragstart',
-	        DRAG: 'drag',
-	        DRAGEND: 'dragend',
-	        MOUSEDOWN: 'mousedown',
-	        TOUCHSTART: 'touchstart',
-	        MOUSEUP: 'mouseup',
-	        MOUSEUPOUTSIDE: 'mouseupoutside',
-	        TOUCHEND: 'touchend',
-	        TOUCHENDOUTSIDE: 'touchendoutside',
-	        MOUSEMOVE: 'mousemove',
-	        TOUCHMOVE: 'touchmove',
-	        CLICK: 'click',
-	        TAP: 'tap'
-	    };
-	    return GameObject;
-	}(Container_1.default));
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = GameObject;
-
-
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Container_1 = __webpack_require__(9);
-	var Component = (function (_super) {
-	    __extends(Component, _super);
-	    function Component(name) {
-	        _super.call(this);
-	        this.name = name;
-	    }
-	    Component.prototype.update = function (delta) {
-	        return this;
-	    };
-	    Component.describe = function (component) {
-	        var describe = {
-	            name: component.name,
-	            component: component
-	        };
-	        return describe;
-	    };
-	    return Component;
-	}(Container_1.default));
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = Component;
-
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Point_1 = __webpack_require__(3);
-	var DraggableData = (function (_super) {
-	    __extends(DraggableData, _super);
-	    function DraggableData() {
-	        _super.call(this);
-	        this.enabled = false;
-	        this.eventsOnce = false;
-	        this.dragging = false;
-	        this.index = 0;
-	    }
-	    DraggableData.prototype.get = function (event) {
-	        return new Point_1.default(event.data.global.x, event.data.global.y);
-	    };
-	    DraggableData.prototype.getGap = function (event) {
-	        return this.get(event).sub(this.dragStart.x, this.dragStart.y);
-	    };
-	    return DraggableData;
-	}(Object));
-	exports.DraggableData = DraggableData;
-
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
-	var Window_1 = __webpack_require__(15);
-	var InputSwitch_1 = __webpack_require__(16);
+	var Window_1 = __webpack_require__(10);
+	var InputSwitch_1 = __webpack_require__(11);
 	var Keyboard = (function (_super) {
 	    __extends(Keyboard, _super);
 	    function Keyboard() {
@@ -1161,7 +913,7 @@
 
 
 /***/ },
-/* 15 */
+/* 10 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1170,7 +922,7 @@
 
 
 /***/ },
-/* 16 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -1227,6 +979,279 @@
 	}(EventEmitter));
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = InputSwitch;
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var PIXI = __webpack_require__(4);
+	var Point_1 = __webpack_require__(3);
+	var Container = (function (_super) {
+	    __extends(Container, _super);
+	    function Container() {
+	        _super.call(this);
+	        this.position = new Point_1.default();
+	    }
+	    Container.prototype.each = function (iterator) {
+	        for (var i = 0, len = this.children.length; i < len; i++) {
+	            if (iterator(this.children[i], i) === false)
+	                break;
+	        }
+	        return this;
+	    };
+	    Container.prototype.len = function () {
+	        return this.children.length;
+	    };
+	    return Container;
+	}(PIXI.Container));
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = Container;
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Point_1 = __webpack_require__(3);
+	var GameObject_1 = __webpack_require__(14);
+	var Camera = (function (_super) {
+	    __extends(Camera, _super);
+	    function Camera(screen) {
+	        _super.call(this);
+	        this.position = new Point_1.default();
+	        this.followSpeed = 1;
+	        this.screen = screen;
+	    }
+	    Camera.prototype.sees = function (target) {
+	        //followed object is always visible
+	        if (target === this.followTarget)
+	            true;
+	        //translate camera position to normal canvas viewport
+	        var selfPosition = this.position.clone().mul(-1);
+	        var targetPosition = target.position.clone();
+	        var camRelPosition = targetPosition.sub(selfPosition);
+	        //if detects square collision the target is visible
+	        var c1 = camRelPosition.y < this.screen.canvas.height;
+	        var c2 = camRelPosition.y + target.height > 0;
+	        var c3 = camRelPosition.x + target.width > 0;
+	        var c4 = camRelPosition.x < this.screen.canvas.width;
+	        return c1 && c2 && c3 && c4;
+	    };
+	    Camera.prototype.follow = function (target, speed) {
+	        if (speed === void 0) { speed = 1; }
+	        this.followTarget = target;
+	        this.followSpeed = speed;
+	        return this;
+	    };
+	    Camera.prototype.stopFollow = function () {
+	        this.followTarget = null;
+	        return this;
+	    };
+	    Camera.prototype.update = function (delta) {
+	        if (!this.followTarget)
+	            return this;
+	        var lerpTo = this.followTarget.position
+	            .clone().sub(this.screen.halfSize).mul(-1)
+	            .sub(this.followTarget.width >> 1, this.followTarget.height >> 1);
+	        this.position.lerp(lerpTo, this.followSpeed);
+	        return this;
+	    };
+	    return Camera;
+	}(GameObject_1.default));
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = Camera;
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Container_1 = __webpack_require__(12);
+	var Component_1 = __webpack_require__(15);
+	var DraggableData_1 = __webpack_require__(16);
+	var GameObject = (function (_super) {
+	    __extends(GameObject, _super);
+	    function GameObject() {
+	        _super.call(this);
+	        this.draggableData = new DraggableData_1.DraggableData();
+	        this.states = {};
+	        this.components = [];
+	        this.interactive = true;
+	    }
+	    GameObject.prototype.addComponent = function (component) {
+	        this.components.push(Component_1.default.describe(component));
+	        this.addChild(component);
+	        return component;
+	    };
+	    GameObject.prototype.removeComponent = function (component) {
+	        var index = this.components.indexOf(Component_1.default.describe(component));
+	        this.components.splice(index, 1);
+	        this.removeChild(component);
+	        return component;
+	    };
+	    GameObject.prototype.update = function (delta) {
+	        return this;
+	    };
+	    GameObject.prototype.setDraggable = function (state) {
+	        if (state === void 0) { state = true; }
+	        if (state && !this.draggableData.eventsOnce)
+	            this.initDragEvents();
+	        if (!state)
+	            this.onDragEnd();
+	        this.draggableData.enabled = state;
+	        return this;
+	    };
+	    GameObject.prototype.initDragEvents = function () {
+	        var _this = this;
+	        this.draggableData.eventsOnce = true;
+	        // events for drag start
+	        this.on(GameObject.EVENTS.MOUSEDOWN, function (e) { return _this.onDragStart(e); });
+	        this.on(GameObject.EVENTS.TOUCHSTART, function (e) { return _this.onDragStart(e); });
+	        // events for drag end
+	        this.on(GameObject.EVENTS.MOUSEUP, function () { return _this.onDragEnd(); });
+	        this.on(GameObject.EVENTS.MOUSEUPOUTSIDE, function () { return _this.onDragEnd(); });
+	        this.on(GameObject.EVENTS.TOUCHEND, function () { return _this.onDragEnd(); });
+	        this.on(GameObject.EVENTS.TOUCHENDOUTSIDE, function () { return _this.onDragEnd(); });
+	        // events for drag move
+	        this.on(GameObject.EVENTS.MOUSEMOVE, function (e) { return _this.onDragMove(e); });
+	        this.on(GameObject.EVENTS.TOUCHMOVE, function (e) { return _this.onDragMove(e); });
+	    };
+	    GameObject.prototype.onDragStart = function (event) {
+	        if (!this.draggableData.enabled)
+	            return;
+	        this.draggableData.dragStart = this.draggableData.get(event)
+	            .clone().sub(this.position.x, this.position.y);
+	        this.draggableData.dragging = true;
+	        if (this.draggableData.index)
+	            this.dragstart();
+	    };
+	    GameObject.prototype.onDragMove = function (event) {
+	        if (!this.draggableData.enabled)
+	            return;
+	        if (!this.draggableData.dragging)
+	            return;
+	        this.position.copy(this.draggableData.getGap(event));
+	        this.drag();
+	        this.draggableData.index++;
+	        if (this.draggableData.index === 1)
+	            this.dragstart();
+	    };
+	    GameObject.prototype.onDragEnd = function () {
+	        if (!this.draggableData.enabled)
+	            return;
+	        this.draggableData.dragging = false;
+	        this.dragend();
+	        this.draggableData.index = 0;
+	    };
+	    //@abstract methods
+	    GameObject.prototype.dragstart = function () { return this; };
+	    GameObject.prototype.drag = function () { return this; };
+	    GameObject.prototype.dragend = function () { return this; };
+	    GameObject.prototype.keyup = function (event) { return this; };
+	    GameObject.prototype.key = function (event) { return this; };
+	    GameObject.prototype.keydown = function (event) { return this; };
+	    GameObject.EVENTS = {
+	        DRAGSTART: 'dragstart',
+	        DRAG: 'drag',
+	        DRAGEND: 'dragend',
+	        MOUSEDOWN: 'mousedown',
+	        TOUCHSTART: 'touchstart',
+	        MOUSEUP: 'mouseup',
+	        MOUSEUPOUTSIDE: 'mouseupoutside',
+	        TOUCHEND: 'touchend',
+	        TOUCHENDOUTSIDE: 'touchendoutside',
+	        MOUSEMOVE: 'mousemove',
+	        TOUCHMOVE: 'touchmove',
+	        CLICK: 'click',
+	        TAP: 'tap'
+	    };
+	    return GameObject;
+	}(Container_1.default));
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = GameObject;
+
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Container_1 = __webpack_require__(12);
+	var Component = (function (_super) {
+	    __extends(Component, _super);
+	    function Component(name) {
+	        _super.call(this);
+	        this.name = name;
+	    }
+	    Component.prototype.update = function (delta) {
+	        return this;
+	    };
+	    Component.describe = function (component) {
+	        var describe = {
+	            name: component.name,
+	            component: component
+	        };
+	        return describe;
+	    };
+	    return Component;
+	}(Container_1.default));
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = Component;
+
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Point_1 = __webpack_require__(3);
+	var DraggableData = (function (_super) {
+	    __extends(DraggableData, _super);
+	    function DraggableData() {
+	        _super.call(this);
+	        this.enabled = false;
+	        this.eventsOnce = false;
+	        this.dragging = false;
+	        this.index = 0;
+	    }
+	    DraggableData.prototype.get = function (event) {
+	        return new Point_1.default(event.data.global.x, event.data.global.y);
+	    };
+	    DraggableData.prototype.getGap = function (event) {
+	        return this.get(event).sub(this.dragStart.x, this.dragStart.y);
+	    };
+	    return DraggableData;
+	}(Object));
+	exports.DraggableData = DraggableData;
 
 
 /***/ }
