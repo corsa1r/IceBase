@@ -1,4 +1,5 @@
 import iComponentsDescribe from './interface/iComponentsDescribe';
+import iInternalEvent from '../input/interface/iInternalEvent';
 
 import Container from '../storage/Container';
 import Point from '../math/Point';
@@ -8,6 +9,8 @@ import { DraggableData, iDragMove } from '../input/DraggableData';
 export default class GameObject extends Container {
 
     protected draggableData: DraggableData = new DraggableData();
+    protected states: { [key: string]: boolean } = {};
+
     public components: Array<iComponentsDescribe> = [];
 
     constructor() {
@@ -62,37 +65,32 @@ export default class GameObject extends Container {
         this.draggableData.dragStart = this.draggableData.get(event)
             .clone().sub(this.position.x, this.position.y);
         this.draggableData.dragging = true;
-        if (this.draggableData.index) {
-            this.emit(GameObject.EVENTS.DRAGSTART);
-            this.dragstart();
-        }
+        if (this.draggableData.index) this.dragstart();
     }
 
     private onDragMove(event: iDragMove) {
         if (!this.draggableData.enabled) return;
         if (!this.draggableData.dragging) return;
         this.position.copy(this.draggableData.getGap(event));
-        this.emit(GameObject.EVENTS.DRAG);
         this.drag();
         this.draggableData.index++;
-        if (this.draggableData.index === 1) {
-            this.emit(GameObject.EVENTS.DRAGSTART);
-            this.dragstart();
-        }
+        if (this.draggableData.index === 1) this.dragstart();
     }
 
     private onDragEnd() {
         if (!this.draggableData.enabled) return;
         this.draggableData.dragging = false;
-        this.emit(GameObject.EVENTS.DRAGEND);
         this.dragend();
         this.draggableData.index = 0;
     }
 
     //@abstract methods
-    dragstart() { }
-    drag() { }
-    dragend() { }
+    public dragstart(): GameObject { return this; }
+    public drag(): GameObject { return this; }
+    public dragend(): GameObject { return this; }
+    public keyup(event: iInternalEvent): GameObject { return this; }
+    public key(event: iInternalEvent): GameObject { return this; }
+    public keydown(event: iInternalEvent): GameObject { return this; }
 
     static EVENTS = {
         DRAGSTART: 'dragstart',

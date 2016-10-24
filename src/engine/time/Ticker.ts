@@ -2,54 +2,53 @@ import * as EventEmitter from 'eventemitter3';
 
 export default class Ticker extends EventEmitter {
 
-    private fps: number;
-    private clockId: number | null;
     private lastTime: number | null;
     private delta: number = 0;
-    private timescale: number = 1;
+    private running: boolean = false;
 
-    constructor(fps: number) {
+
+    constructor() {
         super();
-        this.fps = fps;
         this.start();
+        requestAnimationFrame(this.tick.bind(this));
     }
 
-    scale(by: number): Ticker {
-        this.timescale = by;
-        return this;
+    toggle(): Ticker {
+        if (this.isRunning()) {
+            return this.stop();
+        }
+        return this.start();
     }
 
     start(): Ticker {
-        if (this.clockId) return this;
-        this.delta = 0;
-        this.lastTime = Date.now();
-        this.clockId = setInterval(() => this.tick(), this.fps);
-        this.emit(Ticker.EVENTS.START, this.lastTime);
+        if (!this.running) {
+            this.running = true;
+            this.lastTime = Date.now();
+        }
         return this;
     }
 
     stop(): Ticker {
-        if (!this.clockId) return this;
-        clearInterval(this.clockId);
-        this.clockId = null;
-        this.emit(Ticker.EVENTS.STOP, this.lastTime);
+        if (this.running) {
+            this.running = false;
+        }
         return this;
     }
 
+    isRunning(): boolean {
+        return this.running;
+    }
+
     private tick() {
-        let now: number = Date.now();
-        let delta = ((now - this.lastTime) / 1000) * this.timescale;
+        requestAnimationFrame(this.tick.bind(this));
+        if (!this.isRunning()) return this;
+        let now = Date.now();
+        let delta = now - this.lastTime;
         this.lastTime = now;
         this.emit(Ticker.EVENTS.TICK, delta);
     }
 
     static EVENTS = {
-        TICK: 'tick',
-        START: 'start',
-        STOP: 'stop'
-    }
-
-    static DEFAULTS = {
-        FPS: 1000 / 60
+        TICK: 'tick'
     }
 }

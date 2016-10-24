@@ -1,3 +1,6 @@
+import iInternalEvent from '../input/interface/iInternalEvent';
+
+import Keyboard from '../input/Keyboard';
 import Container from '../storage/Container';
 import GameObject from '../gameobject/GameObject';
 import iComponentsDescribe from '../gameobject/interface/iComponentsDescribe';
@@ -10,7 +13,19 @@ export default class Stage extends Container {
     constructor(camera: Camera) {
         super();
         this.camera = camera;
-        this.interactive = true;
+        this.interactive = false;
+
+        this.on(Keyboard.EVENTS.KEY, (event: iInternalEvent) => this.keyboard(event));
+    }
+
+    private keyboard(event: iInternalEvent) {
+        this.each((child: GameObject) => {
+            if (child.interactive) {
+                if (event.state) child.keydown(event);
+                if (!event.state) child.keyup(event);
+                child.key(event);
+            }
+        });
     }
 
     addChild(...childs: Array<GameObject>): Stage {
