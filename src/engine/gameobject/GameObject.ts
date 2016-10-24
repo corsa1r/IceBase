@@ -19,7 +19,6 @@ export default class GameObject extends Container {
     }
 
     addComponent(component: Component): Component {
-        component.parent = this;
         this.components.push(Component.describe(component));
         this.addChild(component);
         return component;

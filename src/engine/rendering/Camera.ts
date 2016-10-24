@@ -6,6 +6,7 @@ export default class Camera extends GameObject {
 
     public position: Point = new Point();
     private followTarget: GameObject | null;
+    private followSpeed: number = 1;
     private screen: Screen;
 
     constructor(screen: Screen) {
@@ -30,8 +31,9 @@ export default class Camera extends GameObject {
         return c1 && c2 && c3 && c4;
     }
 
-    follow(target: GameObject): Camera {
+    follow(target: GameObject, speed: number = 1): Camera {
         this.followTarget = target;
+        this.followSpeed = speed;
         return this;
     }
 
@@ -42,9 +44,10 @@ export default class Camera extends GameObject {
 
     update(delta: number) {
         if (!this.followTarget) return this;
-        this.position = this.followTarget.position
+        let lerpTo = this.followTarget.position
             .clone().sub(this.screen.halfSize).mul(-1)
-            .sub(this.followTarget.width / 2, this.followTarget.height / 2);
+            .sub(this.followTarget.width >> 1, this.followTarget.height >> 1);
+        this.position.lerp(lerpTo, this.followSpeed);
         return this;
     }
 

@@ -53,49 +53,70 @@
 	var Game_1 = __webpack_require__(1);
 	var GameObject_1 = __webpack_require__(11);
 	var PIXI = __webpack_require__(4);
+	var Point_1 = __webpack_require__(3);
 	var canvas = document.getElementById('canvas');
 	var game = new Game_1.default(canvas);
-	var Player = (function (_super) {
-	    __extends(Player, _super);
-	    function Player() {
+	var Ground = (function (_super) {
+	    __extends(Ground, _super);
+	    function Ground() {
 	        _super.call(this);
-	        this.ms = 3;
 	        this.view = new PIXI.Graphics();
-	        this.view.beginFill(0x007b90);
-	        this.view.drawRect(0, 0, 50, 50);
+	        this.view.beginFill(0x006800);
+	        this.view.drawRect(0, 0, 10000, 5);
 	        this.view.endFill();
 	        this.addChild(this.view);
-	        this.pivot.x = this.width / 2;
-	        this.pivot.y = this.height / 2;
-	        this.position.x = 100;
-	        this.position.y = 100;
+	        this.position.x = -5000;
+	        this.position.y = 440;
 	    }
+	    return Ground;
+	}(GameObject_1.default));
+	var Player = (function (_super) {
+	    __extends(Player, _super);
+	    function Player(ground) {
+	        _super.call(this);
+	        this.velocity = new Point_1.default();
+	        this.grounded = false;
+	        this.ground = ground;
+	        this.view = new PIXI.Graphics();
+	        this.view.beginFill(0x686800);
+	        this.view.drawRect(0, 0, 68, 150);
+	        this.view.endFill();
+	        this.addChild(this.view);
+	    }
+	    Player.prototype.update = function (delta) {
+	        this.velocity.sum(0, 0.2);
+	        this.position.y += this.velocity.y;
+	        this.grounded = false;
+	        if (this.position.y + this.height > this.ground.position.y) {
+	            this.position.y = this.ground.position.y - this.height;
+	            this.velocity.set(0, 0);
+	            this.grounded = true;
+	        }
+	        if (this.states['A']) {
+	            this.position.x -= 5;
+	        }
+	        if (this.states['D']) {
+	            this.position.x += 5;
+	        }
+	        return this;
+	    };
 	    Player.prototype.key = function (event) {
 	        this.states[event.name] = event.state;
 	        return this;
 	    };
-	    Player.prototype.update = function (delta) {
-	        if (this.states['A']) {
-	            this.rotation -= 0.1;
-	            this.position.x -= this.ms;
-	        }
-	        if (this.states['D']) {
-	            this.rotation += 0.1;
-	            this.position.x += this.ms;
-	        }
-	        if (this.states['W']) {
-	            this.rotation -= 0.1;
-	            this.position.y -= this.ms;
-	        }
-	        if (this.states['S']) {
-	            this.rotation += 0.1;
-	            this.position.y += this.ms;
+	    Player.prototype.keydown = function (event) {
+	        if (event.name === 'SPACE' && this.grounded) {
+	            this.velocity.y -= 10;
 	        }
 	        return this;
 	    };
 	    return Player;
 	}(GameObject_1.default));
-	game.stage.addChild(new Player());
+	var ground = new Ground();
+	var player = new Player(ground);
+	game.stage.addChild(ground);
+	game.stage.addChild(player);
+	game.camera.follow(player, 0.3);
 
 
 /***/ },
@@ -215,19 +236,19 @@
 	        if (mul === void 0) { mul = 1; }
 	        mul = mul < 0 ? 0 : mul;
 	        mul = mul > 1 ? 1 : mul;
-	        return this.x + (to - this.x) * mul;
+	        this.x += (to - this.x) * mul;
+	        return this;
 	    };
 	    Point.prototype.lerpY = function (to, mul) {
 	        if (mul === void 0) { mul = 1; }
 	        mul = mul < 0 ? 0 : mul;
 	        mul = mul > 1 ? 1 : mul;
-	        return this.y + (to - this.y) * mul;
+	        this.y += (to - this.y) * mul;
+	        return this;
 	    };
 	    Point.prototype.lerp = function (to, mul) {
 	        if (mul === void 0) { mul = 1; }
-	        this.lerpX(to.x, mul);
-	        this.lerpY(to.y, mul);
-	        return this;
+	        return this.lerpX(to.x, mul).lerpY(to.y, mul);
 	    };
 	    return Point;
 	}(PIXI.Point));
@@ -736,6 +757,7 @@
 	    function Camera(screen) {
 	        _super.call(this);
 	        this.position = new Point_1.default();
+	        this.followSpeed = 1;
 	        this.screen = screen;
 	    }
 	    Camera.prototype.sees = function (target) {
@@ -753,8 +775,10 @@
 	        var c4 = camRelPosition.x < this.screen.canvas.width;
 	        return c1 && c2 && c3 && c4;
 	    };
-	    Camera.prototype.follow = function (target) {
+	    Camera.prototype.follow = function (target, speed) {
+	        if (speed === void 0) { speed = 1; }
 	        this.followTarget = target;
+	        this.followSpeed = speed;
 	        return this;
 	    };
 	    Camera.prototype.stopFollow = function () {
@@ -764,9 +788,10 @@
 	    Camera.prototype.update = function (delta) {
 	        if (!this.followTarget)
 	            return this;
-	        this.position = this.followTarget.position
+	        var lerpTo = this.followTarget.position
 	            .clone().sub(this.screen.halfSize).mul(-1)
-	            .sub(this.followTarget.width / 2, this.followTarget.height / 2);
+	            .sub(this.followTarget.width >> 1, this.followTarget.height >> 1);
+	        this.position.lerp(lerpTo, this.followSpeed);
 	        return this;
 	    };
 	    return Camera;
@@ -798,7 +823,6 @@
 	        this.interactive = true;
 	    }
 	    GameObject.prototype.addComponent = function (component) {
-	        component.parent = this;
 	        this.components.push(Component_1.default.describe(component));
 	        this.addChild(component);
 	        return component;

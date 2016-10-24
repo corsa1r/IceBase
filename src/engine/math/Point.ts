@@ -52,21 +52,21 @@ export default class Point extends PIXI.Point {
         return this;
     }
 
-    lerpX(to: number, mul: number = 1): number {
+    lerpX(to: number, mul: number = 1): Point {
         mul = mul < 0 ? 0 : mul;
         mul = mul > 1 ? 1 : mul;
-        return this.x + (to - this.x) * mul;
+        this.x += (to - this.x) * mul;
+        return this;
     }
 
-    lerpY(to: number, mul: number = 1): number {
+    lerpY(to: number, mul: number = 1): Point {
         mul = mul < 0 ? 0 : mul;
         mul = mul > 1 ? 1 : mul;
-        return this.y + (to - this.y) * mul;
+        this.y += (to - this.y) * mul;
+        return this;
     }
 
     lerp(to: Point, mul: number = 1): Point {
-        this.lerpX(to.x, mul);
-        this.lerpY(to.y, mul);
-        return this;
+        return this.lerpX(to.x, mul).lerpY(to.y, mul);
     }
 }
