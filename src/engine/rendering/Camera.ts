@@ -16,7 +16,7 @@ export default class Camera extends GameObject {
 
     sees(target: GameObject): boolean {
         //followed object is always visible
-        if (target === this.followTarget) true;
+        if (target === this.followTarget) return true;
 
         //translate camera position to normal canvas viewport
         let selfPosition = this.position.clone().mul(-1);
