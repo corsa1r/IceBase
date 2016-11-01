@@ -66,7 +66,7 @@ export default class Point extends PIXI.Point {
         return this;
     }
 
-    lerp(to: Point, mul: number = 1): Point {
-        return this.lerpX(to.x, mul).lerpY(to.y, mul);
+    lerp(to: Point, mulx: number = 1, muly?: number): Point {
+        return this.lerpX(to.x, mulx).lerpY(to.y, muly || mulx);
     }
 }
