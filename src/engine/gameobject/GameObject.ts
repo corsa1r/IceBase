@@ -1,9 +1,6 @@
-import iComponentsDescribe from './interface/iComponentsDescribe';
 import iInternalEvent from '../input/interface/iInternalEvent';
-
 import Container from '../storage/Container';
 import Point from '../math/Point';
-import Component from './Component';
 import { DraggableData, iDragMove } from '../input/DraggableData';
 
 export default class GameObject extends Container {
@@ -11,24 +8,9 @@ export default class GameObject extends Container {
     protected draggableData: DraggableData = new DraggableData();
     protected states: { [key: string]: boolean } = {};
 
-    public components: Array<iComponentsDescribe> = [];
-
     constructor() {
         super();
         this.interactive = true;
-    }
-
-    addComponent(component: Component): Component {
-        this.components.push(Component.describe(component));
-        this.addChild(component);
-        return component;
-    }
-
-    removeComponent(component: Component): Component {
-        let index = this.components.indexOf(Component.describe(component));
-        this.components.splice(index, 1);
-        this.removeChild(component);
-        return component;
     }
 
     update(delta: number): GameObject {

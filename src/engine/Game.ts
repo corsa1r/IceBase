@@ -5,6 +5,7 @@ import Renderer from './rendering/Renderer';
 import Ticker from './time/Ticker';
 import Stage from './stage/Stage';
 import Camera from './rendering/Camera';
+import Physics from './physics/Physics';
 
 import Keyboard from './input/Keyboard';
 
@@ -16,6 +17,7 @@ export default class Game {
     public stage: Stage;
     public camera: Camera;
     public keyboard: Keyboard;
+    public physics: Physics;
 
     constructor(canvas: HTMLCanvasElement) {
         this.screen = new Screen(canvas);
@@ -25,6 +27,7 @@ export default class Game {
         this.keyboard = new Keyboard();
         this.keyboard.broadcast(this.stage);
         this.stage.addChild(this.camera);
+        this.physics = new Physics();
         this.ticker = new Ticker();
         this.ticker.on(Ticker.EVENTS.TICK, (delta: number) => this.tick(delta));
     }
@@ -32,6 +35,7 @@ export default class Game {
     private tick(delta: number) {
         this.stage.position = this.camera.position;
         this.stage.update(delta);
+        this.physics.step(this.stage);
         this.renderer.draw(this.stage);
     }
 }
