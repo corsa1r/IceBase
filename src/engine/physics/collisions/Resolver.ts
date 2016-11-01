@@ -10,6 +10,6 @@ export default class Resolver {
     }
 
     resolveRect(AA: Rect, BB: Rect) {
-        console.warn('resolve rect collision');
+        console.warn('resolving rect collision');
     }
 }

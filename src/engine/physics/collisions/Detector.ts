@@ -14,18 +14,14 @@ export default class Detector {
     }
 
     rectCollision(AA: Rect, BB: Rect): boolean {
-        //console.log(AA.right, BB.left);
-        let c1 = AA.position.x + AA.size.x > BB.position.x;
-        let c2 = AA.position.x < BB.position.x + BB.size.x;
-        let c3 = AA.position.y + AA.size.y > BB.position.y;
-        let c4 = AA.position.y < BB.position.y + BB.size.y;
+        let c1 = AA.right > BB.left;
+        let c2 = AA.left < BB.right;
+        let c3 = AA.bot > BB.top;
+        let c4 = AA.top < BB.bot;
         return c1 && c2 && c3 && c4;
     }
 
     circleCollision(AA: Circle, BB: Circle): boolean {
-        let eq1 = Math.pow(BB.position.x - AA.position.x, 2);
-        let eq2 = Math.pow(BB.position.y - AA.position.y, 2)
-        let distance = Math.sqrt(eq1 + eq2);
-        return distance > (AA.radius + BB.radius);
+        return AA.position.distance(BB.position) > (AA.radius + BB.radius);
     }
 }

@@ -31,11 +31,7 @@ export default class Physics {
 
     private detection(AA: Body, BB: Body) {
         if (this.detector.isCollide(AA, BB)) {
-            this.resolve(AA, BB);
+            this.resolver.resolve(AA, BB);
         }
-    }
-
-    private resolve(AA: Body, BB: Body) {
-        this.resolver.resolve(AA, BB);
     }
 }
