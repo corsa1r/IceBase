@@ -28,6 +28,7 @@
     "typescript": "^2.0.3"
   },
   "dependencies": {
+    "@types/eventemitter3": "1.1.29",
     "express": "^4.14.0",
     "pixi.js": "^3.0.9",
     "socket.io": "^1.4.4",
