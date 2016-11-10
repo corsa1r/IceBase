@@ -8,12 +8,21 @@ export default class PhysicsGameObject extends GameObject {
 
     constructor() {
         super();
+        
+        this.body.beginOverlap = (BB: Body) => this.beginOverlap(BB);
+        this.body.overlap = (BB: Body) => this.overlap(BB);
+        this.body.endOverlap = (BB: Body) => this.endOverlap(BB);
     }
 
-    physicsUpdate(gravity: Point) {
-        if (this.body.static) return;
-        this.body.velocity.sum(gravity);
-        this.body.position.sum(this.body.velocity);
-        this.position.copy(this.body.position);
+    beginOverlap(other: Body) {
+
+    }
+
+    endOverlap(other: Body) {
+
+    }
+
+    overlap(other: Body) {
+
     }
 }

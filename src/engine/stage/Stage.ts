@@ -3,6 +3,7 @@ import Keyboard from '../input/Keyboard';
 import Container from '../storage/Container';
 import GameObject from '../gameobject/GameObject';
 import Camera from '../rendering/Camera';
+import PhysicsGameObject from '../gameobject/PhysicsGameObject';
 
 export default class Stage extends Container {
 
@@ -12,7 +13,6 @@ export default class Stage extends Container {
         super();
         this.camera = camera;
         this.interactive = false;
-
         this.on(Keyboard.EVENTS.KEY, (event: iInternalEvent) => this.keyboard(event));
     }
 
@@ -38,5 +38,14 @@ export default class Stage extends Container {
             //finally update the child
             child.update(delta);
         });
+    }
+
+    getAllPhysicsChilds(): Container {
+        let found = new Container();
+        this.each((child: GameObject) => {
+            if (!(child instanceof PhysicsGameObject)) return;
+            found.addChild(child);
+        });
+        return found;
     }
 }

@@ -35,7 +35,7 @@ export default class Game {
     private tick(delta: number) {
         this.stage.position = this.camera.position;
         this.stage.update(delta);
-        this.physics.step(this.stage);
+        this.physics.step(this.stage.getAllPhysicsChilds());
         this.renderer.draw(this.stage);
     }
 }

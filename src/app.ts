@@ -19,11 +19,19 @@ class Box extends PhysicsGameObject {
         this.body = new Rect();
         this.body.static = st;
         this.body.position.copy(this.position);
+        this.body.size.x = 100;
+        this.body.size.y = 100;
         this.view.beginFill(0x007b90);
         this.view.drawRect(0, 0, this.body.size.x, this.body.size.y);
         this.addChild(this.view);
     }
 }
 
-game.stage.addChild(new Box(100, 100, false));
-game.stage.addChild(new Box(100, 400, true));
+function getRandomInt(min, max): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+let box = new Box(100, 100, false);
+let box2 = new Box(200, 200, false);
+
+game.stage.addChild(box, box2);

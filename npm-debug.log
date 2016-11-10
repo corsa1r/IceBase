@@ -1,0 +1,91 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/bin/node',
+1 verbose cli   '/usr/local/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   'https://github.com/clark-stevenson/matter.d.ts.git' ]
+2 info using npm@3.10.8
+3 info using node@v7.0.0
+4 silly loadCurrentTree Starting
+5 silly install loadCurrentTree
+6 silly install readLocalPackageData
+7 silly fetchPackageMetaData https://github.com/clark-stevenson/matter.d.ts.git
+8 silly fetchOtherPackageData https://github.com/clark-stevenson/matter.d.ts.git
+9 silly cache add args [ 'https://github.com/clark-stevenson/matter.d.ts.git', null ]
+10 verbose cache add spec https://github.com/clark-stevenson/matter.d.ts.git
+11 silly cache add parsed spec Result {
+11 silly cache add   raw: 'https://github.com/clark-stevenson/matter.d.ts.git',
+11 silly cache add   scope: null,
+11 silly cache add   escapedName: null,
+11 silly cache add   name: null,
+11 silly cache add   rawSpec: 'https://github.com/clark-stevenson/matter.d.ts.git',
+11 silly cache add   spec: 'git+https://github.com/clark-stevenson/matter.d.ts.git',
+11 silly cache add   type: 'hosted',
+11 silly cache add   hosted:
+11 silly cache add    { type: 'github',
+11 silly cache add      ssh: 'git@github.com:clark-stevenson/matter.d.ts.git',
+11 silly cache add      sshUrl: 'git+ssh://git@github.com/clark-stevenson/matter.d.ts.git',
+11 silly cache add      httpsUrl: 'git+https://github.com/clark-stevenson/matter.d.ts.git',
+11 silly cache add      gitUrl: 'git://github.com/clark-stevenson/matter.d.ts.git',
+11 silly cache add      shortcut: 'github:clark-stevenson/matter.d.ts',
+11 silly cache add      directUrl: 'https://raw.githubusercontent.com/clark-stevenson/matter.d.ts/master/package.json' } }
+12 verbose addRemoteGit caching https://github.com/clark-stevenson/matter.d.ts.git
+13 verbose addRemoteGit git+https://github.com/clark-stevenson/matter.d.ts.git is a repository hosted by github
+14 silly tryClone cloning git+https://github.com/clark-stevenson/matter.d.ts.git via git+https://github.com/clark-stevenson/matter.d.ts.git
+15 verbose tryClone git-https-github-com-clark-stevenson-matter-d-ts-git-fa44fd97 not in flight; caching
+16 verbose correctMkdir /Users/vladimirenchev/.npm/_git-remotes correctMkdir not in flight; initializing
+17 verbose makeDirectory /Users/vladimirenchev/.npm/_git-remotes creation not in flight; initializing
+18 silly makeDirectory /Users/vladimirenchev/.npm/_git-remotes uid: 501 gid: 20
+19 info git [ 'clone',
+19 info git   '--template=/Users/vladimirenchev/.npm/_git-remotes/_templates',
+19 info git   '--mirror',
+19 info git   'https://github.com/clark-stevenson/matter.d.ts.git',
+19 info git   '/Users/vladimirenchev/.npm/_git-remotes/git-https-github-com-clark-stevenson-matter-d-ts-git-fa44fd97' ]
+20 verbose mirrorRemote git+https://github.com/clark-stevenson/matter.d.ts.git git clone https://github.com/clark-stevenson/matter.d.ts.git
+21 verbose correctMkdir /Users/vladimirenchev/.npm/_git-remotes correctMkdir not in flight; initializing
+22 verbose setPermissions git+https://github.com/clark-stevenson/matter.d.ts.git set permissions on /Users/vladimirenchev/.npm/_git-remotes/git-https-github-com-clark-stevenson-matter-d-ts-git-fa44fd97
+23 verbose resolveHead git+https://github.com/clark-stevenson/matter.d.ts.git original treeish: master
+24 info git [ 'rev-list', '-n1', 'master' ]
+25 silly resolveHead git+https://github.com/clark-stevenson/matter.d.ts.git resolved treeish: 95a990862137a3cb5a9db320f625aa4ad7827364
+26 verbose resolveHead git+https://github.com/clark-stevenson/matter.d.ts.git resolved Git URL: git+https://github.com/clark-stevenson/matter.d.ts.git#95a990862137a3cb5a9db320f625aa4ad7827364
+27 silly resolveHead Git working directory: /var/folders/qd/v48rdvh57555jd7wxj50x_2h0000gn/T/npm-20826-189ecc02/git-cache-1bc59b14/95a990862137a3cb5a9db320f625aa4ad7827364
+28 info git [ 'clone',
+28 info git   '/Users/vladimirenchev/.npm/_git-remotes/git-https-github-com-clark-stevenson-matter-d-ts-git-fa44fd97',
+28 info git   '/var/folders/qd/v48rdvh57555jd7wxj50x_2h0000gn/T/npm-20826-189ecc02/git-cache-1bc59b14/95a990862137a3cb5a9db320f625aa4ad7827364' ]
+29 verbose cloneResolved git+https://github.com/clark-stevenson/matter.d.ts.git clone Cloning into '/var/folders/qd/v48rdvh57555jd7wxj50x_2h0000gn/T/npm-20826-189ecc02/git-cache-1bc59b14/95a990862137a3cb5a9db320f625aa4ad7827364'...
+29 verbose cloneResolved done.
+30 info git [ 'checkout', '95a990862137a3cb5a9db320f625aa4ad7827364' ]
+31 verbose checkoutTreeish git+https://github.com/clark-stevenson/matter.d.ts.git checkout Note: checking out '95a990862137a3cb5a9db320f625aa4ad7827364'.
+31 verbose checkoutTreeish
+31 verbose checkoutTreeish You are in 'detached HEAD' state. You can look around, make experimental
+31 verbose checkoutTreeish changes and commit them, and you can discard any commits you make in this
+31 verbose checkoutTreeish state without impacting any branches by performing another checkout.
+31 verbose checkoutTreeish
+31 verbose checkoutTreeish If you want to create a new branch to retain commits you create, you may
+31 verbose checkoutTreeish do so (now or later) by using -b with the checkout command again. Example:
+31 verbose checkoutTreeish
+31 verbose checkoutTreeish   git checkout -b <new-branch-name>
+31 verbose checkoutTreeish
+31 verbose checkoutTreeish HEAD is now at 95a9908... Cleaned comments
+32 info git [ 'submodule', '-q', 'update', '--init', '--recursive' ]
+33 verbose updateSubmodules git+https://github.com/clark-stevenson/matter.d.ts.git submodule update
+34 error addLocal Could not install /var/folders/qd/v48rdvh57555jd7wxj50x_2h0000gn/T/npm-20826-189ecc02/git-cache-1bc59b14/95a990862137a3cb5a9db320f625aa4ad7827364
+35 silly fetchPackageMetaData Error: EISDIR: illegal operation on a directory, read
+35 silly fetchPackageMetaData  error for https://github.com/clark-stevenson/matter.d.ts.git { Error: EISDIR: illegal operation on a directory, read errno: -21, code: 'EISDIR', syscall: 'read' }
+36 silly rollbackFailedOptional Starting
+37 silly rollbackFailedOptional Finishing
+38 silly runTopLevelLifecycles Finishing
+39 silly install printInstalled
+40 verbose stack Error: EISDIR: illegal operation on a directory, read
+41 verbose cwd /Users/vladimirenchev/Documents/projects/IceBase
+42 error Darwin 16.1.0
+43 error argv "/usr/local/bin/node" "/usr/local/bin/npm" "install" "https://github.com/clark-stevenson/matter.d.ts.git"
+44 error node v7.0.0
+45 error npm  v3.10.8
+46 error code EISDIR
+47 error errno -21
+48 error syscall read
+49 error eisdir EISDIR: illegal operation on a directory, read
+50 error eisdir This is most likely not a problem with npm itself
+50 error eisdir and is related to npm not being able to find a package.json in
+50 error eisdir a package you are trying to install.
+51 verbose exit [ -21, true ]

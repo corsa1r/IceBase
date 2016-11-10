@@ -43,7 +43,7 @@ export default class Ticker extends EventEmitter {
         requestAnimationFrame(this.tick.bind(this));
         if (!this.isRunning()) return this;
         let now = Date.now();
-        let delta = now - this.lastTime;
+        let delta = (now - this.lastTime) / 1000;
         this.lastTime = now;
         this.emit(Ticker.EVENTS.TICK, delta);
     }

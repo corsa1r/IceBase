@@ -5,33 +5,28 @@ import GameObject from '../gameobject/GameObject';
 import PhysicsGameObject from '../gameobject/PhysicsGameObject';
 import Body from './bodies/Body';
 import Resolver from './collisions/Resolver';
+import Container from '../storage/Container';
 
 export default class Physics {
 
     private detector: Detector = new Detector();
     private resolver: Resolver = new Resolver();
-    private gravity: Point = new Point(0, 0.009);
+    private gravity: Point = new Point(0, 0);
 
-    step(stage: Stage) {
-        stage.each((AA: GameObject) => {
-            stage.each((BB: GameObject) => {
-                this.validState(AA, BB);
-            });
+    step(childs: Container) {
+        childs.each((AA: PhysicsGameObject) => {
+            childs.each((BB: PhysicsGameObject) => this.validateState(AA, BB));
         });
     }
 
-    private validState(GAA: GameObject, GBB: GameObject) {
-        if (GAA instanceof PhysicsGameObject && GBB instanceof PhysicsGameObject) {
-            if (GAA !== GBB && !GAA.body.static) {
-                GAA.physicsUpdate(this.gravity);
-                this.detection(GAA.body, GBB.body);
-            }
-        }
+    validateState(AA: PhysicsGameObject, BB: PhysicsGameObject) {
+        if (AA === BB) return;
+        if (AA.body.static) return;
+        return this.detect(AA.body, BB.body);
     }
 
-    private detection(AA: Body, BB: Body) {
-        if (this.detector.isCollide(AA, BB)) {
-            this.resolver.resolve(AA, BB);
-        }
+    detect(AA: Body, BB: Body) {
+        if (!this.detector.isCollide(AA, BB)) return;
+        AA.collisions.push(this.resolver.resolve(AA, BB));
     }
 }

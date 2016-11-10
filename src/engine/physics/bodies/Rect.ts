@@ -28,4 +28,12 @@ export default class Rect extends Body {
     get right(): number {
         return this.position.x + this.size.x;
     }
+
+    get midX(): number {
+        return this.left + (this.size.x / 2);
+    }
+
+    get midY(): number {
+        return this.top + (this.size.y / 2);
+    }
 }
